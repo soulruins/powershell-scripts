@@ -1,6 +1,6 @@
 $mailserver = "yourexchangeserver.example.com" # Укажите имя своего Exchange-сервера
 $topnum = "10" # Определите количество строк в результирующих таблицах
-[bool]$report = $true # Формировать суммарный отчет по всем ящикам в csv-файл. $true - да, $false - нет
+[bool]$report = $false # Формировать суммарный отчет по всем ящикам в csv-файл. $true - да, $false - нет
 function Get-ExchangeStat {
 $exchdata = Get-WmiObject -Namespace root\MicrosoftExchangeV2 -class Exchange_Mailbox -ComputerName $mailserver | Select-Object -Property LastLoggedOnUserAccount,MailboxDisplayName,Size,TotalItems,StorageGroupName,StoreName,LastLogonTime,LastLogoffTime | ? -FilterScript { ( $_.MailboxDisplayName -notmatch "SMTP") -and ( $_.MailboxDisplayName -notmatch "SystemMailbox" ) -and ($_.LastLoggedOnUserAccount.Count -gt 0) }
 # суммарная статистика
@@ -39,7 +39,11 @@ Write-Host "TOP"$topnum": Неактивных ящиков" -ForegroundColor Gr
 $exchdatalogon | ft
 Write-Host "ИТОГО: суммарные данные" -ForegroundColor Gray
 Write-Host;
-"Количество писем     : " + "{0:N0}" -f $totalItems 
-"Суммарный размер (GB): " + "{0:N1}" -f $totalSizeCV 
+"Количество писем     : " + "{0:N0}" -f $totalItems
+"Суммарный размер (GB): " + "{0:N1}" -f $totalSizeCV
+if ($report) {
+Write-Host;
+Write-Host "Сформирован csv-отчет:" $PSScriptRoot\mailboxstat.csv -ForegroundColor Gray
+}
 }
 Get-ExchangeStat
