@@ -1,3 +1,3 @@
 # powershell-scripts
 Some PoSh scripts
-exch
+exch-stat
